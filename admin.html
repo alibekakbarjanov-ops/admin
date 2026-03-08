@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SOF SHOP — Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="./admin.css"/>
+</head>
+<body>
+
+<!-- ══════════ AUTH PAGE ══════════ -->
+<div id="authPage" class="auth-page">
+  <div class="auth-bg">
+    <div class="ab ab1"></div><div class="ab ab2"></div><div class="ab ab3"></div>
+  </div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="logo-mark">◈</span>
+      <span class="logo-name">SOF ADMIN</span>
+    </div>
+    <p class="auth-hint">Tizimga kirish yoki ro'yxatdan o'tish</p>
+    <div class="auth-tabs">
+      <button id="atLogin" class="atab active" type="button">Kirish</button>
+      <button id="atReg"   class="atab"        type="button">Ro'yxatdan o'tish</button>
+    </div>
+    <form id="loginForm" class="aform">
+      <div class="fi"><label>Telefon raqam</label>
+        <input id="lPhone" type="tel" placeholder="+998901234567"/></div>
+      <div class="fi"><label>Parol</label>
+        <input id="lPass" type="password" placeholder="••••••••"/></div>
+      <button class="abtn primary full" type="submit">Kirish →</button>
+    </form>
+    <form id="regForm" class="aform hidden">
+      <div class="fg2">
+        <div class="fi"><label>Ism *</label><input id="rFirst" placeholder="Ali" required/></div>
+        <div class="fi"><label>Familya *</label><input id="rLast" placeholder="Valiyev" required/></div>
+      </div>
+      <div class="fi"><label>Telefon raqam *</label>
+        <input id="rPhone" type="tel" placeholder="+998901234567" required/></div>
+      <div class="fi"><label>Parol * (min 6 belgi)</label>
+        <input id="rPass" type="password" placeholder="••••••••" required/></div>
+      <div class="fi">
+        <label>Rol tanlang</label>
+        <div class="role-grid">
+          <div class="role-opt active" data-role="admin"><span>⚙</span> Admin</div>
+          <div class="role-opt"        data-role="driver"><span>🚗</span> Shofer</div>
+        </div>
+        <input type="hidden" id="rRole" value="admin"/>
+      </div>
+      <button class="abtn primary full" type="submit">Ro'yxatdan o'tish →</button>
+    </form>
+    <div id="authMsg" class="amsg hidden"></div>
+  </div>
+</div>
+
+<!-- ══════════ ADMIN DASHBOARD ══════════ -->
+<div id="adminPage" class="dash hidden">
+  <div id="sbOverlay" class="sb-overlay"></div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sb-top">
+      <span class="logo-mark sm">◈</span>
+      <span class="logo-name sm">SOF ADMIN</span>
+    </div>
+    <nav class="sb-nav">
+      <button class="snav active" data-sec="products" type="button"><span>📦</span> Mahsulotlar</button>
+      <button class="snav" data-sec="orders"   type="button"><span>🛒</span> Buyurtmalar</button>
+      <button class="snav" data-sec="ads"      type="button"><span>📢</span> Reklamalar</button>
+      <button class="snav" data-sec="users"    type="button"><span>👥</span> Foydalanuvchilar</button>
+      <button class="snav" data-sec="drivers"  type="button"><span>🚗</span> Shoferlar</button>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-av" id="sbAv">A</div>
+      <div>
+        <div class="sb-name" id="sbName">—</div>
+        <div class="sb-role" style="display:flex;align-items:center;gap:5px">
+          Administrator
+          <span class="socket-dot" title="Realtime holati"></span>
+        </div>
+      </div>
+      <button class="logout-btn" id="adminLogout" type="button">⎋</button>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <button id="burger" class="burger" type="button">☰</button>
+      <div class="dash-title" id="dashTitle">Mahsulotlar</div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <section id="sec-products" class="dsec">
+      <div class="stabs">
+        <button class="stab active" data-ptab="add"  type="button">➕ Mahsulot kiritish</button>
+        <button class="stab"        data-ptab="list" type="button">📋 Kiritilgan mahsulotlar</button>
+      </div>
+      <div id="ptab-add" class="ptab">
+        <div class="card">
+          <div class="card-title" id="prodFormTitle">Yangi mahsulot kiritish</div>
+          <form id="productForm" class="pform">
+            <input type="hidden" id="editId"/>
+            <div class="fg2">
+              <div class="fi"><label>Mahsulot nomi *</label><input id="pName" required placeholder="Divan"/></div>
+              <div class="fi"><label>Unikal kod *</label><input id="pCode" required placeholder="DIV001"/></div>
+            </div>
+            <div class="fg3">
+              <div class="fi"><label>Narx (so'm) *</label><input id="pPrice" type="number" min="0" required placeholder="1500000"/></div>
+              <div class="fi"><label>3 oyga (so'm/oy)</label><input id="p3m" type="number" min="0" placeholder="600000"/></div>
+              <div class="fi"><label>6 oyga (so'm/oy)</label><input id="p6m" type="number" min="0" placeholder="320000"/></div>
+            </div>
+            <div class="fg2">
+              <div class="fi"><label>12 oyga (so'm/oy)</label><input id="p12m" type="number" min="0" placeholder="180000"/></div>
+              <div class="fi"><label>📦 Zaxira (dona)</label><input id="pStock" type="number" min="0" placeholder="0" value="0"/></div>
+            </div>
+            <div class="fg2">
+              <div class="fi">
+                <label>Turi</label>
+                <select id="pType">
+                  <option value="normal">Oddiy</option>
+                  <option value="discount">Chegirma</option>
+                  <option value="new">Yangi</option>
+                </select>
+              </div>
+            </div>
+            <div class="fg2">
+              <div class="fi" id="discFi"><label>Chegirma %</label><input id="pDiscount" type="number" min="1" max="90" placeholder="20"/></div>
+              <div class="fi hidden" id="newFi"><label>Yangi necha kun</label><input id="pNewDays" type="number" min="1" value="7"/></div>
+            </div>
+            <div class="fg2">
+              <div class="fi"><label>Katalog</label><select id="pCat"></select></div>
+              <div class="fi"><label>Sub-katalog</label><select id="pSub"></select></div>
+            </div>
+            <div class="fi"><label>Ranglar (vergul bilan)</label><input id="pColors" placeholder="oq, qora, jigarrang"/></div>
+            <div class="fi"><label>Tavsif</label><textarea id="pDesc" rows="3" placeholder="Mahsulot haqida..."></textarea></div>
+            <div class="fi">
+              <label>Rasmlar (max 10 · jpg, png, webp, gif)</label>
+              <div id="imgDrop" class="img-drop">
+                <input type="file" id="imgFile" accept="image/jpeg,image/png,image/webp,image/gif" multiple style="display:none"/>
+                <div id="imgDropInner" class="img-drop-inner">
+                  <div class="idi-icon">🖼</div>
+                  <div class="idi-text">Rasmlarni tashlang yoki <b>tanlang</b></div>
+                  <div class="idi-sub">JPG · PNG · WEBP · GIF</div>
+                </div>
+              </div>
+              <div id="imgPreview" class="img-preview"></div>
+            </div>
+            <div class="pform-btns">
+              <button class="abtn primary" type="submit" id="saveProdBtn">💾 Saqlash</button>
+              <button class="abtn danger hidden" type="button" id="cancelEdit">✕ Bekor</button>
+            </div>
+            <div id="prodMsg" class="amsg hidden"></div>
+          </form>
+        </div>
+      </div>
+      <div id="ptab-list" class="ptab hidden">
+        <div class="card">
+          <input id="prodSearch" class="search-bar" placeholder="🔍 Nom yoki kod bo'yicha..."/>
+          <div id="prodList" class="prod-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section id="sec-orders" class="dsec hidden">
+      <div class="stabs">
+        <button class="stab active" data-otab="new"      type="button">🆕 Buyurtmalar</button>
+        <button class="stab"        data-otab="delivery" type="button">🚗 Shofer yetkazib berish</button>
+        <button class="stab"        data-otab="archive"  type="button">📁 Arxiv</button>
+      </div>
+      <div id="otab-new"      class="otab"><div id="newOrdersList" class="olist"></div></div>
+      <div id="otab-delivery" class="otab hidden">
+        <div class="toolbar"><select id="delivFilterDrv" class="sel-bar"><option value="">Barcha shoferlar</option></select></div>
+        <div id="deliveryList" class="olist"></div>
+      </div>
+      <div id="otab-archive"  class="otab hidden">
+        <div class="toolbar"><select id="archFilterDrv" class="sel-bar"><option value="">Barcha shoferlar</option></select></div>
+        <div id="archiveList"  class="olist"></div>
+      </div>
+    </section>
+
+    <!-- ADS -->
+    <section id="sec-ads" class="dsec hidden">
+      <div class="card">
+        <div class="card-title">Reklama mahsulotlarini tanlang</div>
+        <p class="card-sub">Tick bosing → Saqlash → Mijoz ilovasida ko'rinadi</p>
+        <input id="adsSearch" class="search-bar" placeholder="🔍 Mahsulot nomi..."/>
+        <div id="adsList" class="ads-list"></div>
+        <div class="pform-btns" style="margin-top:16px">
+          <button class="abtn primary" id="saveAdsBtn" type="button">💾 Reklamani saqlash</button>
+        </div>
+        <div id="adsMsg" class="amsg hidden"></div>
+      </div>
+    </section>
+
+    <!-- ════════════ USERS — YANGILANGAN ════════════ -->
+    <section id="sec-users" class="dsec hidden">
+
+      <!-- Statistika kartalar -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-val" id="statTotal">0</div>
+          <div class="stat-lbl">Jami foydalanuvchi</div>
+        </div>
+        <div class="stat-card online">
+          <div class="stat-icon">🟢</div>
+          <div class="stat-val" id="statOnline">0</div>
+          <div class="stat-lbl">Online</div>
+        </div>
+        <div class="stat-card active">
+          <div class="stat-icon">🔵</div>
+          <div class="stat-val" id="statActive">0</div>
+          <div class="stat-lbl">Kirgan</div>
+        </div>
+        <div class="stat-card inactive">
+          <div class="stat-icon">⚪</div>
+          <div class="stat-val" id="statInactive">0</div>
+          <div class="stat-lbl">Chiqib ketgan</div>
+        </div>
+      </div>
+
+      <!-- Xarita -->
+      <div class="card" id="usersMapWrap" style="margin-bottom:14px">
+        <div class="card-title">🗺 Foydalanuvchilar xaritada</div>
+        <p class="card-sub">Mijozlar (🔴) va shoferlar (🚗) ko'rsatiladi. Mijoz markeriga bosing → eng yaqin shoferni ko'ring</p>
+        <div id="usersMap" class="leaflet-map" style="height:400px"></div>
+      </div>
+
+      <!-- Qidiruv va filter -->
+      <div class="card">
+        <div class="users-toolbar">
+          <input id="usersSearch" class="search-bar" style="margin-bottom:0;flex:1" placeholder="🔍 Ism, telefon yoki Gmail..."/>
+          <div class="uf-filters">
+            <button class="uf-btn active" data-uf="all"      type="button">Hammasi</button>
+            <button class="uf-btn"        data-uf="online"   type="button">🟢 Online</button>
+            <button class="uf-btn"        data-uf="active"   type="button">🔵 Kirgan</button>
+            <button class="uf-btn"        data-uf="inactive" type="button">⚪ Chiqqan</button>
+          </div>
+        </div>
+        <div id="usersList" class="ulist" style="margin-top:14px"></div>
+      </div>
+    </section>
+
+    <!-- ════════════ DRIVERS — YANGILANGAN ════════════ -->
+    <section id="sec-drivers" class="dsec hidden">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">🗺 Shoferlar xaritada</div>
+        <p class="card-sub">Pastdagi ro'yxatdan shofer ismiga bosing — xaritada ko'rsatiladi</p>
+        <div id="adminMap" class="leaflet-map"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Shoferlar ro'yxati</div>
+        <p class="card-sub" style="margin-bottom:10px">Ismi bosilsa xaritada avtomatik ko'rsatiladi</p>
+        <div id="driversList" class="ulist"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ══════════ DRIVER PAGE — YANGILANGAN ══════════ -->
+<div id="driverPage" class="driver-page hidden">
+
+  <!-- Top header -->
+  <header class="drv-header">
+    <div class="drv-header-left">
+      <div class="drv-avatar" id="drvAvatar">S</div>
+      <div>
+        <div class="drv-name" id="driverLabel">Shofer</div>
+        <div class="drv-role">Yetkazib beruvchi</div>
+      </div>
+    </div>
+    <div class="drv-header-right">
+      <div class="drv-gps-pill" id="drvGpsPill">
+        <div class="drv-gps-dot" id="gpsDot"></div>
+        <span id="gpsLabel">Aniqlanmoqda...</span>
+      </div>
+      <span class="socket-dot" title="Realtime holati" style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.2);display:inline-block;flex:0 0 auto"></span>
+      <button class="logout-btn" id="driverLogout" type="button">⎋</button>
+    </div>
+  </header>
+
+  <!-- GPS Status Banner -->
+  <div class="drv-status-banner" id="drvStatusBanner">
+    <div class="drv-status-icon" id="drvStatusIcon">📡</div>
+    <div>
+      <div class="drv-status-title" id="drvStatusTitle">GPS aniqlanmoqda...</div>
+      <div class="drv-status-sub" id="drvStatusSub">Joylashuv avtomatik olinmoqda</div>
+    </div>
+    <div class="drv-coords" id="drvCoords">—</div>
+  </div>
+
+  <!-- Xarita -->
+  <div class="drv-map-wrap">
+    <div id="driverMap" class="drv-map"></div>
+    <!-- Accuracy ring overlay -->
+    <div class="drv-map-overlay" id="drvMapOverlay">
+      <div class="drv-map-loading">
+        <div class="drv-spinner"></div>
+        <span>GPS signal kutilmoqda...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buyurtmalar -->
+  <div class="drv-orders-wrap">
+    <div class="drv-orders-header">
+      <div class="drv-orders-title">📦 Mening buyurtmalarim</div>
+      <div class="drv-orders-count" id="drvOrdersCount">0</div>
+    </div>
+    <div id="driverOrdersList" class="drv-olist"></div>
+    <div id="driverOrdersEmpty" class="drv-empty hidden">
+      <div class="drv-empty-icon">🎉</div>
+      <div>Hozircha buyurtma yo'q</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODALS ══════════ -->
+<!-- Assign modal -->
+<div id="assignModal" class="modal hidden">
+  <div class="mcard">
+    <div class="mhead">
+      <span class="mcard-title">🚗 Shoferni tanlang</span>
+      <button class="mbtn-x" id="assignClose" type="button">✕</button>
+    </div>
+    <div id="assignList" class="assign-list"></div>
+    <div class="pform-btns" style="margin-top:14px">
+      <button class="abtn primary" id="assignConfirm" type="button">✔ Tasdiqlash</button>
+    </div>
+    <div id="assignMsg" class="amsg hidden"></div>
+  </div>
+</div>
+
+<!-- Receipt modal -->
+<div id="receiptModal" class="modal hidden">
+  <div class="mcard">
+    <div class="mhead">
+      <span class="mcard-title">📋 Buyurtma cheki</span>
+      <button class="mbtn-x" id="receiptClose" type="button">✕</button>
+    </div>
+    <div id="receiptBox" class="receipt-box"></div>
+  </div>
+</div>
+
+<!-- ════════ FOYDALANUVCHI MODAL (YANGI) ════════ -->
+<div id="userModal" class="modal hidden">
+  <div class="mcard">
+    <div class="mhead">
+      <span class="mcard-title">👤 Foydalanuvchi ma'lumotlari</span>
+      <button class="mbtn-x" id="userModalClose" type="button">✕</button>
+    </div>
+    <div class="um-profile">
+      <div class="um-av" id="umAv">?</div>
+      <div class="um-details">
+        <div class="um-name" id="umName">—</div>
+        <div class="um-status" id="umStatus">—</div>
+      </div>
+    </div>
+    <div class="um-fields">
+      <div class="um-field">
+        <span class="um-label">✉️ Gmail</span>
+        <span class="um-val" id="umEmail">—</span>
+      </div>
+      <div class="um-field">
+        <span class="um-label">📞 Telefon</span>
+        <span class="um-val" id="umPhone">—</span>
+      </div>
+      <div class="um-field">
+        <span class="um-label">🆔 Mijoz ID</span>
+        <span class="um-val" id="umId">—</span>
+      </div>
+      <div class="um-field">
+        <span class="um-label">📍 Manzil</span>
+        <span class="um-val" id="umRegion">—</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <a id="umMapLink" class="abtn primary hidden" href="#" target="_blank"
+         style="text-decoration:none;font-size:13px;padding:9px 14px">
+        🗺 Google Maps da ko'rish
+      </a>
+      <button id="umMapBtn" class="abtn secondary hidden" type="button" style="font-size:13px">
+        📍 Admin xaritasida ko'rish
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toastEl" class="toast hidden"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Socket.io realtime -->
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script type="module" src="./admin.js"></script>
+</body>
+</html>
